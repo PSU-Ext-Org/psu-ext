@@ -8,3 +8,5 @@ to explore the project repositories.
 
 - [Software quick-start guide](doc/software-quick-start.md) — configure and run
   the Proxy, Script Runner, and frontend on Windows, macOS, or Linux.
+- [Third-party TCP devices](doc/third-party-devices.md) — configure dashboard
+  widgets for Siglent SPD4323X and Rigol DM858E instruments.
