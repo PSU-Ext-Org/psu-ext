@@ -1,8 +1,55 @@
 # PSU-EXT Software Quick Start
 
-> **Software availability:** The PSU-EXT team is working to provide installers
-> for Linux, macOS, and Windows. For now, PSU-EXT software is available through
-> the manual source-based installation process described in this guide.
+The fastest way to run PSU-EXT is to install the latest published release. The
+installer downloads checksum-verified release files, keeps the application and
+its data under your user profile, and configures the Proxy, Script Runner, and
+frontend as user-level services without requiring administrator privileges.
+
+## Install the Latest Release
+
+Use the bootstrap command for your platform to download the `psu-ext` command.
+
+### Linux x86-64
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/PSU-Ext-Org/psu-ext-software/main/psu-install/install-linux.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+### Apple Silicon macOS
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/PSU-Ext-Org/psu-ext-software/main/psu-install/install-macos.sh | sh
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+### Windows 11 x64
+
+```powershell
+Invoke-WebRequest `
+  https://raw.githubusercontent.com/PSU-Ext-Org/psu-ext-software/main/psu-install/install-windows.ps1 `
+  -OutFile install-windows.ps1
+pwsh -NoProfile -File .\install-windows.ps1
+$env:Path += ";$env:LOCALAPPDATA\Programs\PSU-EXT"
+```
+
+The initial macOS and Windows binaries are unsigned, so the operating system
+may ask you to approve them the first time they run.
+
+After installing the command, download the current PSU-EXT release and start
+all services:
+
+```sh
+psu-ext install
+psu-ext start
+```
+
+`psu-ext start` prints the local URL to open in your browser. For supported
+platforms, installation locations, updates, service commands, and
+troubleshooting, see the
+[`psu-install` README](https://github.com/PSU-Ext-Org/psu-ext-software/blob/main/psu-install/README.md).
+
+## Manual Installation From Sources
 
 This guide starts the PSU-EXT WebSocket Proxy, Script Runner, and browser
 frontend from a local checkout of the `psu-ext-software` repository. The three
@@ -14,7 +61,7 @@ applications run as separate processes:
 | Frontend | `http://localhost:5173` | Provides the dashboard, configuration UI, and script IDE |
 | Script Runner | `http://localhost:8081` | Enables IDE script management and execution against configured devices |
 
-## Prerequisites
+### Prerequisites
 
 Install the following software before starting:
 
@@ -42,7 +89,7 @@ Run each backend command from `psu-ext-software/psu-be`. Relative paths such as
 `./devices.json`, `./script-definitions`, and `./script-storage` are resolved
 from that working directory.
 
-## 1. Start the Proxy
+### 1. Start the Proxy
 
 Open a terminal in `psu-ext-software/psu-be` and start the Proxy.
 
@@ -63,7 +110,7 @@ cd psu-ext-software/psu-be
 Leave this terminal running. Unless overridden, Spring Boot listens on port
 `8080` and exposes the WebSocket endpoint at `/ws/scpi`.
 
-## 2. Install and start the frontend
+### 2. Install and start the frontend
 
 Open a second terminal in `psu-ext-software/psu-fe`.
 
@@ -88,7 +135,7 @@ Open the URL printed by Vite, normally `http://localhost:5173`.
 PowerShell may prevent the `npm.ps1` shim from running. Using `npm.cmd`, as in
 the example above, avoids changing the PowerShell execution policy.
 
-## 3. Connect the frontend to the Proxy
+### 3. Connect the frontend to the Proxy
 
 1. Open **Config** in the frontend header.
 2. In the **WebSocket** widget, enter:
@@ -115,7 +162,7 @@ At this point, the Proxy and frontend provide the minimal working PSU-EXT
 dashboard configuration. IDE backend features, including script management and
 execution, require the Script Runner configured in the next steps.
 
-## 4. Start the Script Runner
+### 4. Start the Script Runner
 
 Open another terminal in `psu-ext-software/psu-be` and start the Script Runner.
 
@@ -169,7 +216,7 @@ psu:
 The equivalent Spring environment variable is
 `PSU_WEB_CORS_ALLOWED_ORIGIN`.
 
-## 5. Configure Script Runner for IDE features
+### 5. Configure Script Runner for IDE features
 
 1. Open **IDE** in the frontend.
 2. Open **Settings → Backend**.
@@ -186,7 +233,7 @@ The equivalent Spring environment variable is
 If the Script Runner runs on another machine, its CORS allowed origin must
 match the browser frontend's full origin, including scheme and port.
 
-## 6. Verify the complete setup
+### 6. Verify the complete setup
 
 Use this startup order on subsequent runs:
 
@@ -212,12 +259,12 @@ A minimal Script Runner source is:
 Replace `PSU1` with the configured Script Runner device name and connect that
 device before running the script.
 
-## Optional setup
+### Optional setup
 
 The steps below are not required for a TCP-only setup using device profiles
 created through the frontend.
 
-### USB connections: select the jSerialComm platform
+#### USB connections: select the jSerialComm platform
 
 Complete this step only when the Proxy or Script Runner will connect to a USB
 CDC serial device. Set `psu.transport.usb.platform` to the platform directory
@@ -271,7 +318,7 @@ On Linux, the user must also have permission to open the device, commonly
 `/dev/ttyACM0` or `/dev/ttyUSB0`. Distribution-specific groups are often named
 `dialout` or `uucp`; log out and back in after adding group membership.
 
-### Predefine device registries
+#### Predefine device registries
 
 The normal setup is to create device profiles through the frontend after the
 services start:
@@ -347,7 +394,7 @@ export PSU_CONNECTION_DEVICES_FILE=./proxy-devices.json
 export PSU_CONNECTION_DEVICES_FILE=./script-runner-devices.json
 ```
 
-## Troubleshooting
+### Troubleshooting
 
 | Symptom | Likely cause and action |
 | --- | --- |
