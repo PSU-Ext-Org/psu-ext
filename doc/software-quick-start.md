@@ -49,6 +49,69 @@ platforms, installation locations, updates, service commands, and
 troubleshooting, see the
 [`psu-install` README](https://github.com/PSU-Ext-Org/psu-ext-software/blob/main/psu-install/README.md).
 
+## Connect the Default Device
+
+New installations include a device named `PSUEXT1` in
+`~/.psu-ext/data/devices.json`. Its default connection is **USB**, using port
+`COM5` at **9600 baud**. Both dashboards are preconfigured for this device name.
+Existing device configurations are preserved during installation and updates.
+See the [installer README's installed layout](https://github.com/PSU-Ext-Org/psu-ext-software/blob/main/psu-install/README.md#installed-layout)
+for details.
+
+1. Connect the PSU-EXT board to your computer over USB.
+2. Open the browser URL printed by `psu-ext start`, then open **Config**.
+3. In **Device List**, edit `PSUEXT1` and replace `COM5` with the board's serial
+   port on your system. Keep the baud rate at `9600` and save the profile.
+4. Select **Connect** for the device. Keep the name `PSUEXT1` so the default
+   dashboard widgets can find it.
+5. Open the terminal icon beside **Config** to show the **WebSocket Monitor**.
+   Select `PSUEXT1` as the command target and send `*IDN?` to check that the
+   device responds.
+
+## Connect the Device to Wi-Fi
+
+Configure Wi-Fi over the working USB connection. In the **WebSocket Monitor**,
+select `PSUEXT1` and send each command below separately, replacing the example
+network name and password with your own:
+
+```text
+WIFI:SSID MyNetwork
+WIFI:PASS MyWifiPassword
+WIFI:SSID?
+WIFI:PASS?
+```
+
+The first two commands store the credentials in nonvolatile memory and return
+no response on success. The queries return the stored network name and `SET`
+when a password is stored; the password itself is never returned.
+
+Restart the board after setting or changing credentials. The firmware uses the
+stored credentials to connect at startup. Reconnect `PSUEXT1` over USB, then
+check the connection:
+
+```text
+WIFI:STATUS?
+```
+
+A connected device returns a response such as:
+
+```text
+"MyNetwork",1,42,"192.168.1.50"
+```
+
+The fields are the network name, connection state (`1` connected, `0`
+disconnected), connection time in seconds, and IP address.
+
+To use Wi-Fi for device control, disconnect the USB profile in **Device List**,
+edit `PSUEXT1` to use **TCP**, enter the returned IP address and port `5025`,
+save, and select **Connect**. The computer running the Proxy must be able to
+reach the board on that network. Keep the device name `PSUEXT1` to continue
+using the default dashboards.
+
+To remove the saved credentials, send `WIFI:CLEAR` over USB and restart the
+board. See the firmware's [Wi-Fi SCPI reference](https://github.com/PSU-Ext-Org/psu-ext-firmware/blob/main/.doc/scpi-ref.md#wifi)
+for all Wi-Fi commands and response formats.
+
 ## Manual Installation From Sources
 
 This guide starts the PSU-EXT WebSocket Proxy, Script Runner, and browser
